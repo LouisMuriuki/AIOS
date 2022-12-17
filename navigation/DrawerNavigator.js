@@ -5,7 +5,7 @@ import BottomTabNavigator from './BottomTabNavigator';
 const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator screenOptions={{ title:"AIOS"}}>
     <Drawer.Screen name="Home" component={BottomTabNavigator} />
     </Drawer.Navigator>
   )

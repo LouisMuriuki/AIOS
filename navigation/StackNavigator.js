@@ -7,7 +7,7 @@ import Qrcode from '../screens/Qrcode';
 const Stack = createStackNavigator();
 const StackNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName='Home'>
+    <Stack.Navigator initialRouteName='Home' screenOptions={{headerShown: false}}>
         <Stack.Screen name="Home" component={Home}/>
         <Stack.Screen name="Barcode" component={Barcode}/>
         <Stack.Screen name="Qrcode" component={Qrcode}/>

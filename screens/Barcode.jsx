@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DateTime } from "luxon";
 const Barcode = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -14,7 +16,26 @@ const Barcode = () => {
     getBarCodeScannerPermissions();
   }, []);
 
+  const setObjectValue = async (data,type) => {
+    const date=new Date()
+    
+    try {
+      const jsonValue = JSON.stringify({
+        codetype:"Barcode",
+        value:data,
+        type:type,
+        time:DateTime.toJSDate(date),
+      })
+      await AsyncStorage.setItem('scanned', jsonValue)
+    } catch(e) {
+      // save error
+    }
+  
+    console.log('Done.')
+  }
+
   const handleBarCodeScanned = ({ type, data }) => {
+    setObjectValue (data,type)
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
   };
@@ -47,7 +68,7 @@ const Barcode = () => {
 };
 
 export default Barcode;
-
+const opacity = "rgba(0, 0, 0, .6)";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
