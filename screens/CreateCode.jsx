@@ -1,37 +1,99 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, ToastAndroid, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
+import { Camera } from 'expo-camera';
 import DropDownPicker from "react-native-dropdown-picker";
 import Button from "../components/reusables/Button";
 import QRcodeGen from "../components/reusables/QRcodeGen";
 import Barcode from "react-native-barcode-svg";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as Print from "expo-print";
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from "expo-file-system";
 const CreateCode = () => {
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState();
   const [value, setValue] = useState("qrcode");
-  const [pressed, setPressed] = useState(false);
+  const [pressed, setPressed] = useState(0);
   const [contact, setContact] = useState({ name: "", number: "" });
   const [items, setItems] = useState([
     { label: "Barcode", value: "barcode" },
     { label: "QRcode", value: "qrcode" },
   ]);
-
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  let dataUrl = "";
+  console.log(input);
   const [pressableitems, setPressableItems] = useState([
     "Text",
     "Contact",
     "Link",
   ]);
-  const [pressablevalue, setPressableValue] = useState();
+  const [pressablevalue, setPressableValue] = useState("Text");
   const [qRref, setQRref] = useState();
   const ref = useRef();
   useEffect(() => {
-    const firstRender = ref.current;
-    if (firstRender) {
-      ref.current = false;
-    } else {
-      setInput([contact]);
+    if (pressablevalue === "Contact") {
+      const firstRender = ref.current;
+      if (firstRender) {
+        ref.current = false;
+      } else {
+        setInput([contact]);
+      }
     }
   }, [contact]);
+
+  const getDataURL = () => {
+    qRref?.toDataURL(callback);
+  };
+
+  function callback(dataURL) {
+    dataUrl = dataURL;
+  }
+  saveFile = async (fileUri) => {
+    if (permission === "granted") {
+      const asset = await MediaLibrary.createAssetAsync(fileUri);
+      await MediaLibrary.createAlbumAsync("Download", asset, false);
+    }
+  };
+  const downloadFile = async () => {
+    getDataURL();
+    try {
+      let filePath = await Print.printToFileAsync({
+        html:
+          ' <div style = "margin-top: 40%; margin-left: 30%;"><h2 style = "margin-left: 50px; font-size: 45px;">LetMeIn</h2>' +
+          '<img src="' +
+          dataUrl +
+          '"' +
+          'alt="Red dot" style = "margin-left: 20px; margin-top: 10px;" />' +
+          "</div>",
+        width: 612,
+        height: 792,
+      });
+
+      const pdfName = `${filePath.uri.slice(
+        0,
+        filePath.uri.lastIndexOf("/") + 1
+      )}QRCode.pdf`;
+
+      await FileSystem.moveAsync({
+        from: filePath.uri,
+        to: pdfName,
+      });
+
+      console.log("PDF Generated", pdfName);
+      saveFile(dataUrl);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const download = () => {
+    if (value === "qrcode") {
+      console.log("i run");
+      downloadFile();
+    } else if (value === "barcode") {
+    }
+  };
+
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{
@@ -63,11 +125,12 @@ const CreateCode = () => {
                   alignItems="center"
                   flexDirection="row"
                   fontSize={18}
-                  backgroundColor={pressablevalue?"#d3d3d3":"#FFA500"}
-                  borderColor="#FFA500"
+                  rippleColor="#FFA500"
+                  backgroundColor={pressed === i ? "#FFA500" : "#d3d3d3"}
+                  borderColor={pressed === i ? "#FFA500" : "#d3d3d3"}
                   color="#ffffff"
                   onPress={() => {
-                    setPressableValue(items)
+                    [setPressableValue(items), setPressed(i)];
                   }}
                 />
               );
@@ -84,18 +147,16 @@ const CreateCode = () => {
             />
           </View>
 
-          {pressablevalue === "Text" || "Link" ? (
+          {pressed === 0 ? (
             <TextInput
-              placeholder={
-                pressablevalue === "Text" ? "Enter text" : "Enter url"
-              }
+              placeholder="Enter text"
               values={input}
               onChangeText={(e) => setInput(e)}
               autoCorrect={false}
               style={styles.input}
             ></TextInput>
           ) : null}
-          {pressablevalue === "Contact" ? (
+          {pressed === 1 ? (
             <>
               <TextInput
                 placeholder="Contact Name"
@@ -117,6 +178,15 @@ const CreateCode = () => {
               ></TextInput>
             </>
           ) : null}
+          {pressed === 2 ? (
+            <TextInput
+              placeholder="Enter url"
+              values={input}
+              onChangeText={(e) => setInput(e)}
+              autoCorrect={false}
+              style={styles.input}
+            ></TextInput>
+          ) : null}
         </View>
         <View style={styles.bottom}>
           {value === "qrcode" ? (
@@ -132,6 +202,12 @@ const CreateCode = () => {
                 maxWidth={300}
                 height={120}
                 format="CODE128"
+                onError={() => {
+                  ToastAndroid.show(
+                    "Barcode Contact not supported!",
+                    ToastAndroid.SHORT
+                  );
+                }}
               />
             </View>
           ) : null}
@@ -152,6 +228,9 @@ const CreateCode = () => {
               height={45}
               fontSize={20}
               fontWeight="bold"
+              onPress={() => {
+                download();
+              }}
             />
           ) : null}
         </View>

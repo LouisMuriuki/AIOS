@@ -22,12 +22,12 @@ const BottomTabNavigator = () => {
         <Ionicons name="create" size={24} color="black" />
       ),
     }}/>
-      <Tab.Screen name="History" component={ScanHistory}  options={{
+      {/* <Tab.Screen name="History" component={ScanHistory}  options={{
       tabBarLabel: 'History',
       tabBarIcon: () => (
         <MaterialIcons name="history" size={24} color="black" />
       ),
-    }}/>
+    }}/> */}
     </Tab.Navigator>
   );
 };

@@ -1,12 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DateTime } from "luxon";
+import { ModalContext } from "../context/ModalContext";
+import MainModal from "../components/reusables/Modal";
 const Barcode = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
-
+  const { mainModal, setMainModal } = useContext(ModalContext);
+  const [data, setData] = useState()
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -37,7 +40,8 @@ const Barcode = () => {
   const handleBarCodeScanned = ({ type, data }) => {
     setObjectValue (data,type)
     setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    setData(data)
+    setMainModal(true)
   };
 
   if (hasPermission === null) {
@@ -63,6 +67,11 @@ const Barcode = () => {
       {scanned && (
         <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
       )}
+        <MainModal>
+      <Text style={{ whiteSpace: "pre-line" }}>
+      {`${data}\n `}
+      </Text>
+    </MainModal>
     </View>
   );
 };

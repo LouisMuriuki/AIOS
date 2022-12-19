@@ -1,12 +1,15 @@
 import { Button, StyleSheet, Text, View } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DateTime } from "luxon";
+import MainModal from "../components/reusables/Modal";
+import { ModalContext } from "../context/ModalContext";
 const Qrcode = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
-
+  const [data, setData] = useState()
+  const { mainModal, setMainModal } = useContext(ModalContext);
   const scanOverlay = {
     position: "absolute",
     backgroundColor: "rgba(0, 0, 0, .6)",
@@ -43,7 +46,8 @@ const Qrcode = () => {
   const handleBarCodeScanned = ({ type, data }) => {
     setObjectValue(data, type);
     setScanned(true);
-    alert(`QRCODE with type ${type} and data ${data} has been scanned!`);
+    setData(data)
+    setMainModal(true)
   };
 
   if (hasPermission === null) {
@@ -80,6 +84,11 @@ const Qrcode = () => {
       {scanned && (
         <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
       )}
+      <MainModal>
+      <Text style={{ whiteSpace: "pre-line" }}>
+      {`${data}\n `}
+      </Text>
+    </MainModal>
     </View>
   );
 };

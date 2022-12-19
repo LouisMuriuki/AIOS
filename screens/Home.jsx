@@ -11,10 +11,10 @@ const Home = ({navigation}) => {
           All in One Scanner
         </Text>
         <Text style={{ fontSize: 16 }}>
-          Please place the bar/Qr code in the image
+          Please place the bar/Qr code in 
         </Text>
-        <Text style={{ fontSize: 16 }}>view so that we can scan and</Text>
-        <Text style={{ fontSize: 16 }}>verify the assets.</Text>
+        <Text style={{ fontSize: 16 }}>the image view so that we </Text>
+        <Text style={{ fontSize: 16 }}>can scan it for you.</Text>
       </View>
       <View style={styles.btncontainer}>
           <Button
