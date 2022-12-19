@@ -8,7 +8,7 @@ import { ModalContext } from "../context/ModalContext";
 const Qrcode = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
-  const [data, setData] = useState()
+  const [data, setData] = useState();
   const { mainModal, setMainModal } = useContext(ModalContext);
   const scanOverlay = {
     position: "absolute",
@@ -24,30 +24,30 @@ const Qrcode = () => {
     getBarCodeScannerPermissions();
   }, []);
 
-  const setObjectValue = async (data, type) => {
-    const date = new Date();
-    console.log(date);
-    try {
-      const jsonValue = JSON.stringify({
-        codetype: "Qrcode",
-        value: data,
-        type: type,
-        time: DateTime.toJSDate(date),
-      });
-      await AsyncStorage.setItem("scanned", jsonValue);
-      console.log("scanned.");
-    } catch (e) {
-      console.log(e.message);
-    }
+  // const setObjectValue = async (data, type) => {
+  //   const date = new Date();
+  //   console.log(date);
+  //   try {
+  //     const jsonValue = JSON.stringify({
+  //       codetype: "Qrcode",
+  //       value: data,
+  //       type: type,
+  //       time: DateTime.toJSDate(date),
+  //     });
+  //     await AsyncStorage.setItem("scanned", jsonValue);
+  //     console.log("scanned.");
+  //   } catch (e) {
+  //     console.log(e.message);
+  //   }
 
-    console.log("Done.");
-  };
+  //   console.log("Done.");
+  // };
 
   const handleBarCodeScanned = ({ type, data }) => {
-    setObjectValue(data, type);
+    // setObjectValue(data, type);
     setScanned(true);
-    setData(data)
-    setMainModal(true)
+    setData(data);
+    setMainModal(true);
   };
 
   if (hasPermission === null) {
@@ -85,10 +85,21 @@ const Qrcode = () => {
         <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
       )}
       <MainModal>
-      <Text style={{ whiteSpace: "pre-line" }}>
-      {`${data}\n `}
-      </Text>
-    </MainModal>
+        <Text
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: 22,
+            textDecorationLine:"underline",
+            marginBottom:20,
+          }}
+        >
+          QRCODE INFOMATION
+        </Text>
+        <Text style={{ whiteSpace: "pre-line", fontSize: 17 }}>
+          {data?.replace(/;/g, "\n")}
+        </Text>
+      </MainModal>
     </View>
   );
 };

@@ -9,7 +9,7 @@ const Barcode = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const { mainModal, setMainModal } = useContext(ModalContext);
-  const [data, setData] = useState()
+  const [data, setData] = useState();
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -19,29 +19,29 @@ const Barcode = () => {
     getBarCodeScannerPermissions();
   }, []);
 
-  const setObjectValue = async (data,type) => {
-    const date=new Date()
-    
-    try {
-      const jsonValue = JSON.stringify({
-        codetype:"Barcode",
-        value:data,
-        type:type,
-        time:DateTime.toJSDate(date),
-      })
-      await AsyncStorage.setItem('scanned', jsonValue)
-    } catch(e) {
-      // save error
-    }
-  
-    console.log('Done.')
-  }
+  // const setObjectValue = async (data, type) => {
+  //   const date = new Date();
+
+  //   try {
+  //     const jsonValue = JSON.stringify({
+  //       codetype: "Barcode",
+  //       value: data,
+  //       type: type,
+  //       time: DateTime.toJSDate(date),
+  //     });
+  //     await AsyncStorage.setItem("scanned", jsonValue);
+  //   } catch (e) {
+  //     // save error
+  //   }
+
+  //   console.log("Done.");
+  // };
 
   const handleBarCodeScanned = ({ type, data }) => {
-    setObjectValue (data,type)
+    // setObjectValue(data, type);
     setScanned(true);
-    setData(data)
-    setMainModal(true)
+    setData(data);
+    setMainModal(true);
   };
 
   if (hasPermission === null) {
@@ -67,11 +67,22 @@ const Barcode = () => {
       {scanned && (
         <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
       )}
-        <MainModal>
-      <Text style={{ whiteSpace: "pre-line" }}>
-      {`${data}\n `}
-      </Text>
-    </MainModal>
+      <MainModal>
+      <Text
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: 22,
+            textDecorationLine:"underline",
+            marginBottom:20,
+          }}
+        >
+          BARCODE INFOMATION
+        </Text>
+        <Text style={{ whiteSpace: "pre-line",fontSize: 17 }}>
+          {data?.replace(/;/g, "\n")}
+        </Text>
+      </MainModal>
     </View>
   );
 };
