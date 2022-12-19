@@ -18,6 +18,8 @@ const Button = ({
   width,
   paddingHorizontal,
   borderRadius,
+  borderColor,
+  borderWidth,
   justifyContent,
   alignItems,
   flexDirection,
@@ -37,6 +39,9 @@ const Button = ({
         marginBottom: marginBottom,
         marginHorizontal:marginHorizontal,
         marginTop: marginTop,
+        borderColor: borderColor,
+        flexDirection: flexDirection,
+        borderWidth: borderWidth,
       }}
     >
       <Pressable

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import Button from "../components/reusables/Button";
 import QRcodeGen from "../components/reusables/QRcodeGen";
@@ -9,12 +9,29 @@ const CreateCode = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [value, setValue] = useState("qrcode");
+  const [pressed, setPressed] = useState(false);
+  const [contact, setContact] = useState({ name: "", number: "" });
   const [items, setItems] = useState([
     { label: "Barcode", value: "barcode" },
     { label: "QRcode", value: "qrcode" },
   ]);
-  const [qRref, setQRref] = useState();
 
+  const [pressableitems, setPressableItems] = useState([
+    "Text",
+    "Contact",
+    "Link",
+  ]);
+  const [pressablevalue, setPressableValue] = useState();
+  const [qRref, setQRref] = useState();
+  const ref = useRef();
+  useEffect(() => {
+    const firstRender = ref.current;
+    if (firstRender) {
+      ref.current = false;
+    } else {
+      setInput([contact]);
+    }
+  }, [contact]);
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{
@@ -24,6 +41,38 @@ const CreateCode = () => {
     >
       <View style={styles.container}>
         <View style={styles.topcontainer}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              width: "100%",
+              marginHorizontal: 80,
+              marginBottom: 20,
+            }}
+          >
+            {pressableitems.map((items, i) => {
+              return (
+                <Button
+                  text={items}
+                  key={i}
+                  width={70}
+                  height={45}
+                  borderRadius={5}
+                  borderWidth={1}
+                  justifyContent="center"
+                  alignItems="center"
+                  flexDirection="row"
+                  fontSize={18}
+                  backgroundColor={pressablevalue?"#d3d3d3":"#FFA500"}
+                  borderColor="#FFA500"
+                  color="#ffffff"
+                  onPress={() => {
+                    setPressableValue(items)
+                  }}
+                />
+              );
+            })}
+          </View>
           <View style={styles.dropdown}>
             <DropDownPicker
               open={open}
@@ -35,13 +84,39 @@ const CreateCode = () => {
             />
           </View>
 
-          <TextInput
-            placeholder="QR/Barcode value"
-            values={input}
-            onChangeText={(e) => setInput(e)}
-            autoCorrect={false}
-            style={styles.input}
-          ></TextInput>
+          {pressablevalue === "Text" || "Link" ? (
+            <TextInput
+              placeholder={
+                pressablevalue === "Text" ? "Enter text" : "Enter url"
+              }
+              values={input}
+              onChangeText={(e) => setInput(e)}
+              autoCorrect={false}
+              style={styles.input}
+            ></TextInput>
+          ) : null}
+          {pressablevalue === "Contact" ? (
+            <>
+              <TextInput
+                placeholder="Contact Name"
+                values={input}
+                onChangeText={(e) =>
+                  setContact((prev) => ({ ...prev, name: e }))
+                }
+                autoCorrect={false}
+                style={styles.input}
+              ></TextInput>
+              <TextInput
+                placeholder="Phone Number"
+                values={input}
+                onChangeText={(e) =>
+                  setContact((prev) => ({ ...prev, Number: e }))
+                }
+                autoCorrect={false}
+                style={styles.input}
+              ></TextInput>
+            </>
+          ) : null}
         </View>
         <View style={styles.bottom}>
           {value === "qrcode" ? (
@@ -52,7 +127,12 @@ const CreateCode = () => {
             ) : null
           ) : input ? (
             <View style={styles.barcode}>
-              <Barcode value={input} maxWidth={300} height={1220} format="CODE128" />
+              <Barcode
+                value={input}
+                maxWidth={300}
+                height={120}
+                format="CODE128"
+              />
             </View>
           ) : null}
 
@@ -92,7 +172,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop:50,
+    marginTop: 20,
   },
   dropdown: {
     marginBottom: 90,
