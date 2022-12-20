@@ -11,7 +11,7 @@ const Home = ({navigation}) => {
           All in One Scanner
         </Text>
         <Text style={{ fontSize: 16 }}>
-          Please place the bar/Qr code in 
+          Please place the Bar/Qr code in 
         </Text>
         <Text style={{ fontSize: 16 }}>the image view so that we </Text>
         <Text style={{ fontSize: 16 }}>can scan it for you.</Text>
@@ -24,7 +24,7 @@ const Home = ({navigation}) => {
         borderRadius={5}
         marginBottom={40}
         marginHorizontal={30}
-        backgroundColor="#FFA500"
+        backgroundColor="#FF7D54"
         alignItems="center"
         justifyContent="center"
         height={55}
@@ -40,7 +40,7 @@ const Home = ({navigation}) => {
         borderRadius={5}
         marginBottom={90}
         marginHorizontal={30}
-        backgroundColor="#FFA500"
+        backgroundColor="#FF7D54"
         alignItems="center"
         justifyContent="center"
         height={55}

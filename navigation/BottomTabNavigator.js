@@ -12,14 +12,16 @@ const BottomTabNavigator = () => {
     <Tab.Navigator screenOptions={{headerShown: false}}>
       <Tab.Screen name="Scan" component={StackNavigator}  options={{
       tabBarLabel: 'Scan',
-      tabBarIcon: () => (
-        <Ionicons name="scan" size={24} color="black" />
+      tabBarActiveTintColor:"#FF7D54",
+      tabBarIcon: ({focused}) => (
+        <Ionicons name="scan" size={24} color={focused? "#FF7D54":"black"} />
       ),
     }}/>
       <Tab.Screen name="Create" component={CreateCode}  options={{
       tabBarLabel: 'Create',
-      tabBarIcon: () => (
-        <Ionicons name="create" size={24} color="black" />
+      tabBarActiveTintColor:"#FF7D54",
+      tabBarIcon: ({focused}) => (
+        <Ionicons name="create" size={24} color={focused? "#FF7D54":"black"}/>
       ),
     }}/>
       {/* <Tab.Screen name="History" component={ScanHistory}  options={{

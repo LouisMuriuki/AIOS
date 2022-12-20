@@ -42,6 +42,7 @@ const Button = ({
         borderColor: borderColor,
         flexDirection: flexDirection,
         borderWidth: borderWidth,
+        backgroundColor: backgroundColor,
       }}
     >
       <Pressable
