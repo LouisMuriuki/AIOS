@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TextInput, ToastAndroid, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
+import { captureRef } from "react-native-view-shot";
 import { Camera } from "expo-camera";
 import DropDownPicker from "react-native-dropdown-picker";
 import Button from "../components/reusables/Button";
@@ -9,6 +10,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import * as Print from "expo-print";
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 const CreateCode = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -21,9 +23,9 @@ const CreateCode = () => {
     { label: "BARCODE", value: "barcode" },
     { label: "QRCODE", value: "qrcode" },
   ]);
-  const [permission, requestPermission] = Camera.useCameraPermissions();
-  console.log(input);
-  console.log(pressed);
+
+  const [hasmediaLibraryPermission, setHasMediaLibraryPermission] =
+    useState(null);
   const [pressableitems, setPressableItems] = useState([
     "Text",
     "Contact",
@@ -32,22 +34,63 @@ const CreateCode = () => {
   const [pressablevalue, setPressableValue] = useState("Text");
   const [qRref, setQRref] = useState();
   const ref = useRef();
+
+  useEffect(() => {
+    const getmedialibrarypermission = async () => {
+      const mediaLibraryPermission =
+        await MediaLibrary.requestPermissionsAsync();
+      setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
+    };
+    getmedialibrarypermission();
+  }, []);
+
+  const ShareCode = async () => {
+    try {
+      const uri = await captureRef(qRref, {
+        format: "png",
+        quality: 1,
+      });
+      await Sharing.shareAsync(uri).then(() => {});
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const saveFile = async () => {
+    try {
+      const uri = await captureRef(qRref, {
+        format: "png",
+        quality: 1,
+      });
+      await MediaLibrary.saveToLibraryAsync(uri).then(() => {
+        ToastAndroid.show(
+          "Saved to Gallery",
+          ToastAndroid.LONG
+        );
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     if (pressablevalue === "Contact") {
       if (contact?.name?.length > 0 || contact?.number?.length > 0) {
-        setInput([contact]);
+        let contactarray = [];
+        contactarray.push(contact);
+        console.log(contactarray);
+        setInput(contactarray);
       } else {
         setInput("");
       }
     }
-  }, [contact.name, contact.number, pressablevalue]);
+  }, [contact?.name, contact?.number, pressablevalue]);
 
   useEffect(() => {
     if (pressablevalue === "Link") {
       setInput(linkinput);
     }
   }, [linkinput, pressablevalue]);
-  console.log("link " + linkinput);
 
   useEffect(() => {
     if (pressablevalue === "Text") {
@@ -55,31 +98,12 @@ const CreateCode = () => {
     }
   }, [textinput, pressablevalue]);
 
-  console.log("text " + textinput);
-
-  const saveFile = async (fileUri) => {
-    if (permission === "granted") {
-      console.log(fileUri)
-      const asset = await MediaLibrary.createAssetAsync(fileUri);
-      await MediaLibrary.createAlbumAsync("Download", asset, false);
-      console.log("generated")
-    }
-    console.log(fileUri)
-  };
-
-  const download = () => {
-    console.log("fisrt run")
-    try {
-      if (value === "qrcode") {
-        saveFile(qRref?.toDataURL());
-        console.log("trying to save")
-      } else if (value === "barcode") {
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+  if (hasmediaLibraryPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasmediaLibraryPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{
@@ -202,28 +226,48 @@ const CreateCode = () => {
               />
             </View>
           ) : null}
-
-          {/* {input ? (
-            <Button
-              text="Save"
-              color="#ffffff"
-              elevation={1}
-              borderRadius={5}
-              marginBottom={40}
-              marginTop={50}
-              marginHorizontal={10}
-              paddingHorizontal={20}
-              backgroundColor="#FF7D54"
-              alignItems="center"
-              justifyContent="center"
-              height={45}
-              fontSize={20}
-              fontWeight="bold"
-              onPress={() => {
-                download();
-              }}
-            />
-          ) : null} */}
+          {input ? (
+            <View style={{ flexDirection: "row" }}>
+              <Button
+                text="Save"
+                color="#ffffff"
+                elevation={1}
+                borderRadius={5}
+                marginBottom={40}
+                marginTop={50}
+                marginHorizontal={10}
+                paddingHorizontal={20}
+                backgroundColor="#FF7D54"
+                alignItems="center"
+                justifyContent="center"
+                height={45}
+                fontSize={20}
+                fontWeight="bold"
+                onPress={() => {
+                  saveFile();
+                }}
+              />
+              <Button
+                text="Share"
+                color="#ffffff"
+                elevation={1}
+                borderRadius={5}
+                marginBottom={40}
+                marginTop={50}
+                marginHorizontal={10}
+                paddingHorizontal={20}
+                backgroundColor="#FF7D54"
+                alignItems="center"
+                justifyContent="center"
+                height={45}
+                fontSize={20}
+                fontWeight="bold"
+                onPress={() => {
+                  ShareCode();
+                }}
+              />
+            </View>
+          ) : null}
         </View>
       </View>
     </KeyboardAwareScrollView>

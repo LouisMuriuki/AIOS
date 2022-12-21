@@ -1,12 +1,13 @@
 import 'react-native-gesture-handler';
-import { ModalContextProvider } from './context/ModalContext';
-import AppStack from './navigation/AppStack';
+import Main from './Main';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
   return (   
-    <ModalContextProvider>
-       <AppStack/>
-    </ModalContextProvider>
+    <>
+    <StatusBar backgroundColor="#FF7D54" />
+    <Main/>
+    </>
    
   );
 }
