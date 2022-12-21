@@ -1,16 +1,13 @@
 import { StyleSheet, Text, TextInput, ToastAndroid, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { captureRef } from "react-native-view-shot";
-import { Camera } from "expo-camera";
 import DropDownPicker from "react-native-dropdown-picker";
 import Button from "../components/reusables/Button";
 import QRcodeGen from "../components/reusables/QRcodeGen";
-import Barcode from "react-native-barcode-svg";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import * as Print from "expo-print";
 import * as MediaLibrary from "expo-media-library";
-import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
+import Barcode from "@kichiyaki/react-native-barcode-generator";
 const CreateCode = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -33,8 +30,8 @@ const CreateCode = () => {
   ]);
   const [pressablevalue, setPressableValue] = useState("Text");
   const [qRref, setQRref] = useState();
-  const ref = useRef();
-
+  const BarcodeRef = useRef();
+ console.log(BarcodeRef.current)
   useEffect(() => {
     const getmedialibrarypermission = async () => {
       const mediaLibraryPermission =
@@ -46,7 +43,7 @@ const CreateCode = () => {
 
   const ShareCode = async () => {
     try {
-      const uri = await captureRef(qRref, {
+      const uri = await captureRef(value === "qrcode" ? qRref : BarcodeRef, {
         format: "png",
         quality: 1,
       });
@@ -58,13 +55,15 @@ const CreateCode = () => {
 
   const saveFile = async () => {
     try {
-      const uri = await captureRef(qRref, {
+      const uri = await captureRef(value === "qrcode" ? qRref : BarcodeRef, {
         format: "png",
-        quality: 1,
+        quality: 0.8,
       });
       await MediaLibrary.saveToLibraryAsync(uri).then(() => {
         ToastAndroid.show(
-          "Saved to Gallery",
+          value === "qrcode"
+            ? "Saved QRcode to Gallery"
+            : "Saved Barcode to Gallery",
           ToastAndroid.LONG
         );
       });
@@ -212,18 +211,20 @@ const CreateCode = () => {
             ) : null
           ) : input ? (
             <View style={styles.barcode}>
-              <Barcode
-                value={input}
-                maxWidth={300}
-                height={120}
-                format="CODE128"
-                onError={() => {
-                  ToastAndroid.show(
-                    "Unfortunately Barcode does not supported contact Information!",
-                    ToastAndroid.LONG
-                  );
-                }}
-              />
+              <View ref={BarcodeRef}>
+                <Barcode
+                  value={input}
+                  maxWidth={300}
+                  height={120}
+                  format="CODE128"
+                  onError={() => {
+                    ToastAndroid.show(
+                      "Unfortunately Barcode does not supported contact Information!",
+                      ToastAndroid.LONG
+                    );
+                  }}
+                />
+              </View>
             </View>
           ) : null}
           {input ? (
