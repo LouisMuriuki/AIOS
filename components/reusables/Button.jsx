@@ -1,5 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import React from "react";
+import { AntDesign } from "@expo/vector-icons";
 
 const Button = ({
   disabled,
@@ -63,14 +64,7 @@ const Button = ({
           }
         }
       >
-        {icon && (
-          <FontAwesomeIcon
-            icon={icon}
-            style={{ marginRight: 8 }}
-            size={iconsize}
-            color={iconcolor}
-          />
-        )}
+       
         <Text
           style={{
             fontSize: fontSize,
@@ -83,6 +77,9 @@ const Button = ({
         >
           {text}
         </Text>
+        {icon && (
+          <AntDesign name={icon}  size={iconsize} style={{ marginLeft: 10 }} color={iconcolor} />
+        )}
       </Pressable>
     </View>
   );

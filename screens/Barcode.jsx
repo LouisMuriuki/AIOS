@@ -72,12 +72,12 @@ const Barcode = () => {
           style={{
             justifyContent: "center",
             alignItems: "center",
-            fontSize: 22,
+            fontSize: 20,
             textDecorationLine:"underline",
             marginBottom:20,
           }}
         >
-          BARCODE INFOMATION
+          BARCODE INFORMATION
         </Text>
         <Text style={{ whiteSpace: "pre-line",fontSize: 17 }}>
           {data?.replace(/;/g, "\n")}

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, ToastAndroid, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { captureRef } from "react-native-view-shot";
+import ViewShot, { captureRef } from "react-native-view-shot";
 import DropDownPicker from "react-native-dropdown-picker";
 import Button from "../components/reusables/Button";
 import QRcodeGen from "../components/reusables/QRcodeGen";
@@ -31,7 +31,8 @@ const CreateCode = () => {
   const [pressablevalue, setPressableValue] = useState("Text");
   const [qRref, setQRref] = useState();
   const BarcodeRef = useRef();
- console.log(BarcodeRef.current)
+  const QRref = useRef();
+  console.log(BarcodeRef.current);
   useEffect(() => {
     const getmedialibrarypermission = async () => {
       const mediaLibraryPermission =
@@ -43,10 +44,11 @@ const CreateCode = () => {
 
   const ShareCode = async () => {
     try {
-      const uri = await captureRef(value === "qrcode" ? qRref : BarcodeRef, {
+      const uri = await captureRef(value === "qrcode" ? QRref : BarcodeRef, {
         format: "png",
         quality: 1,
       });
+      console.log(uri);
       await Sharing.shareAsync(uri).then(() => {});
     } catch (error) {
       console.log(error);
@@ -55,10 +57,11 @@ const CreateCode = () => {
 
   const saveFile = async () => {
     try {
-      const uri = await captureRef(value === "qrcode" ? qRref : BarcodeRef, {
+      const uri = await captureRef(value === "qrcode" ? QRref : BarcodeRef, {
         format: "png",
         quality: 0.8,
       });
+      console.log(uri);
       await MediaLibrary.saveToLibraryAsync(uri).then(() => {
         ToastAndroid.show(
           value === "qrcode"
@@ -206,12 +209,14 @@ const CreateCode = () => {
           {value === "qrcode" ? (
             input ? (
               <View style={styles.qrcode}>
+                <ViewShot style={{margin:20}} ref={QRref}>
                 <QRcodeGen value={input} getRef={(e) => setQRref(e)} />
+                </ViewShot>
               </View>
             ) : null
           ) : input ? (
             <View style={styles.barcode}>
-              <View ref={BarcodeRef}>
+              <ViewShot style={{margin:20}}  ref={BarcodeRef}>
                 <Barcode
                   value={input}
                   maxWidth={300}
@@ -219,28 +224,39 @@ const CreateCode = () => {
                   format="CODE128"
                   onError={() => {
                     ToastAndroid.show(
-                      "Unfortunately Barcode does not supported contact Information!",
+                      "Unfortunately, Barcode does not supported contact Information!",
                       ToastAndroid.LONG
                     );
                   }}
                 />
-              </View>
+              </ViewShot>
             </View>
           ) : null}
           {input ? (
-            <View style={{ flexDirection: "row" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                justifyContent: "space-around",
+                alignItems: "center",
+                marginLeft:45,
+              }}
+            >
               <Button
                 text="Save"
                 color="#ffffff"
+                icon="download"
+                iconcolor="#fff"
+                iconsize={20}
                 elevation={1}
                 borderRadius={5}
                 marginBottom={40}
                 marginTop={50}
-                marginHorizontal={10}
                 paddingHorizontal={20}
                 backgroundColor="#FF7D54"
                 alignItems="center"
                 justifyContent="center"
+                flexDirection="row"
                 height={45}
                 fontSize={20}
                 fontWeight="bold"
@@ -252,10 +268,13 @@ const CreateCode = () => {
                 text="Share"
                 color="#ffffff"
                 elevation={1}
+                icon="sharealt"
+                iconcolor="#fff"
+                iconsize={20}
                 borderRadius={5}
                 marginBottom={40}
                 marginTop={50}
-                marginHorizontal={10}
+                flexDirection="row"
                 paddingHorizontal={20}
                 backgroundColor="#FF7D54"
                 alignItems="center"

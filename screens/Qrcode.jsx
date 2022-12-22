@@ -89,12 +89,12 @@ const Qrcode = () => {
           style={{
             justifyContent: "center",
             alignItems: "center",
-            fontSize: 22,
+            fontSize: 20,
             textDecorationLine:"underline",
             marginBottom:20,
           }}
         >
-          QRCODE INFOMATION
+          QRCODE INFORMATION
         </Text>
         <Text style={{ whiteSpace: "pre-line", fontSize: 17 }}>
           {data?.replace(/;/g, "\n")}

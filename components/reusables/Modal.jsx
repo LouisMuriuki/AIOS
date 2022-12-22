@@ -1,9 +1,10 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { useContext } from "react";
-import { Modal, StyleSheet,View } from "react-native";
+import { Modal, StyleSheet, View } from "react-native";
 import { ModalContext } from "../../context/ModalContext";
 
-const MainModal = ({children}) => {
+const MainModal = ({ children }) => {
   const { mainModal, setMainModal } = useContext(ModalContext);
   return (
     <Modal
@@ -19,6 +20,9 @@ const MainModal = ({children}) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <View style={styles.cancel} onTouchEnd={() => setMainModal(false)}>
+              <MaterialIcons name="cancel" size={24} color="red" />
+            </View>
             {children}
           </View>
         </View>
@@ -51,7 +55,13 @@ const styles = StyleSheet.create({
     width: 330,
     elevation: 5,
   },
-  
+  cancel: {
+    position: "absolute",
+    top: "30%",
+    right: "-3%",
+    padding:20,
+    marginTop: -32,
+  },
 });
 
 export default MainModal;
