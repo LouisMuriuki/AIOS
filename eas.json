@@ -20,9 +20,19 @@
       "developmentClient": true,
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+     
+    }
   },
   "submit": {
-    "production": {}
+    "product": {
+      "android": {
+        "serviceAccountKeyPath": "../aios-production/pc-api-7008378220244364499-762-e79329eb3ae6.json",
+        "track": "alpha"
+      }
+    },
+    "production": {
+      
+    }
   }
 }
