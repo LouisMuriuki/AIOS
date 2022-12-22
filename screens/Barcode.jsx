@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Button,StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
