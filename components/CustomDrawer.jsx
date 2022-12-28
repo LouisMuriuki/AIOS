@@ -1,11 +1,54 @@
-import { StyleSheet, Text, View, Image } from "react-native";
-import React from 'react'
+import {
+  Share,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Linking,
+  TouchableNativeFeedback,
+} from "react-native";
+import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as StoreReview from "expo-store-review";
 import {
   Entypo,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
+
+const RateUs = async () => {
+  try {
+    if (StoreReview.isAvailableAsync()) {
+      await StoreReview.requestReview()
+      .then(function(response){
+        console.log("response is",response)
+       })
+      .catch(e => { console.log(e) })
+     }
+  } catch (error) {
+    console.log(error);
+  }
+};
+const ShareApp = async () => {
+  const url =
+    "https://play.google.com/store/apps/details?id=com.muriuki.AIOS&hl=en&gl=US";
+  try {
+    const result = await Share.share({
+      title: "App link",
+      message:
+        "Please install this app and stay safe , AppLink :https://play.google.com/store/apps/details?id=com.muriuki.AIOS&hl=en&gl=US",
+      url: "https://play.google.com/store/apps/details?id=com.muriuki.AIOS&hl=en&gl=US",
+    });
+    if (result.action === Share.sharedAction) {
+      if (result.activityType) {
+      } else {
+      }
+    } else if (result.action === Share.dismissedAction) {
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+};
 const CustomDrawer = () => {
   return (
     <View style={{ flex: 1 }}>
@@ -16,45 +59,65 @@ const CustomDrawer = () => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            marginTop:0,
-            backgroundColor:"#FF7D54"
+            marginTop: 0,
+            backgroundColor: "#FF7D54",
           }}
         >
           <Image
             source={require("../assets/drawericon.png")}
-            style={{ width:"100%", height: 270 }}
+            style={{ width: "100%", height: 270 }}
           />
         </View>
       </View>
-      <View style={styles.draweritem}>
-        <MaterialIcons name="star-rate" size={28} color="#FF7D54" />
-        <Text style={styles.drawertext}>Rate Us</Text>
-      </View>
-      <View style={styles.draweritem}>
-        <MaterialIcons name="privacy-tip" size={28} color="#FF7D54" />
-        <Text style={styles.drawertext}>Disclaimer</Text>
-      </View>
-      <View style={styles.draweritem}>
-        <Entypo name="share" size={28} color="#FF7D54" />
-        <Text style={styles.drawertext}>Share with Friends</Text>
-      </View>
+      <TouchableNativeFeedback
+        background={TouchableNativeFeedback.Ripple("#FF7D54", false)}
+      >
+        <View style={styles.draweritem} onTouchStart={RateUs}>
+          <MaterialIcons name="star-rate" size={28} color="#FF7D54" />
+          <Text style={styles.drawertext}>Rate Us</Text>
+        </View>
+      </TouchableNativeFeedback>
+      <TouchableNativeFeedback
+        background={TouchableNativeFeedback.Ripple("#FF7D54", false)}
+      >
+        <View
+          style={styles.draweritem}
+          onTouchStart={() =>
+            Linking.openURL(
+              "https://pages.flycricket.io/all-in-one-scanner-1/privacy.html"
+            )
+          }
+        >
+          <MaterialIcons name="privacy-tip" size={28} color="#FF7D54" />
+          <Text style={styles.drawertext}>Privacy Policy</Text>
+        </View>
+      </TouchableNativeFeedback>
+      <TouchableNativeFeedback
+        background={TouchableNativeFeedback.Ripple("#FF7D54", false)}
+      >
+        <View style={styles.draweritem} onTouchStart={ShareApp}>
+          <Entypo name="share" size={28} color="#FF7D54" />
+          <Text style={styles.drawertext}>Share with Friends</Text>
+        </View>
+      </TouchableNativeFeedback>
     </View>
-  )
-}
+  );
+};
 
-export default CustomDrawer
+export default CustomDrawer;
 
 const styles = StyleSheet.create({
-    draweritem: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 30,
-      paddingLeft:20
-    },
-    drawertext: {
-      fontSize: 20,
-      fontWeight: "400",
-      paddingLeft:20,
-      fontStyle:"bold"
-    },
-  });
+  draweritem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+    paddingLeft: 20,
+    height: 45,
+  },
+  drawertext: {
+    fontSize: 20,
+    fontWeight: "400",
+    paddingLeft: 20,
+    fontStyle: "bold",
+  },
+});

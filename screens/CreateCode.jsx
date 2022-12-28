@@ -1,4 +1,11 @@
-import { StyleSheet, Text, TextInput, ToastAndroid, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  View,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -15,6 +22,7 @@ const CreateCode = () => {
   const [pressed, setPressed] = useState(0);
   const [textinput, setTextInput] = useState("");
   const [linkinput, setLinkInput] = useState("");
+  const [requestpermission, setRequestPermission] = useState(false);
   const [contact, setContact] = useState({ name: "", number: "" });
   const [items, setItems] = useState([
     { label: "BARCODE", value: "barcode" },
@@ -33,14 +41,22 @@ const CreateCode = () => {
   const BarcodeRef = useRef();
   const QRref = useRef();
   console.log(BarcodeRef.current);
+  const renderref = useRef();
   useEffect(() => {
-    const getmedialibrarypermission = async () => {
-      const mediaLibraryPermission =
-        await MediaLibrary.requestPermissionsAsync();
-      setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
-    };
-    getmedialibrarypermission();
-  }, []);
+    const firstrender = renderref.current;
+    if (firstrender) {
+      renderref.current = false;
+    } else {
+      const getmedialibrarypermission = async () => {
+        const mediaLibraryPermission =
+          await MediaLibrary.requestPermissionsAsync();
+        setHasMediaLibraryPermission(
+          mediaLibraryPermission.status === "granted"
+        );
+      };
+      getmedialibrarypermission();
+    }
+  }, [requestpermission]);
 
   const ShareCode = async () => {
     try {
@@ -101,10 +117,10 @@ const CreateCode = () => {
   }, [textinput, pressablevalue]);
 
   if (hasmediaLibraryPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+    return <Text>Requesting for media storage permission</Text>;
   }
   if (hasmediaLibraryPermission === false) {
-    return <Text>No access to camera</Text>;
+    return <Text>No access to media storage</Text>;
   }
   return (
     <KeyboardAwareScrollView
@@ -115,13 +131,17 @@ const CreateCode = () => {
     >
       <View style={styles.container}>
         <View style={styles.topcontainer}>
-          <View
+          <ScrollView
+            horizontal={true}
             style={{
               flexDirection: "row",
-              justifyContent: "space-around",
               width: "100%",
               marginHorizontal: 80,
               marginBottom: 20,
+            }}
+            contentContainerStyle={{
+              justifyContent: "space-around",
+              width: "100%",
             }}
           >
             {pressableitems.map((items, i) => {
@@ -147,7 +167,7 @@ const CreateCode = () => {
                 />
               );
             })}
-          </View>
+          </ScrollView>
           <View style={styles.dropdown}>
             <DropDownPicker
               open={open}
@@ -209,14 +229,14 @@ const CreateCode = () => {
           {value === "qrcode" ? (
             input ? (
               <View style={styles.qrcode}>
-                <ViewShot style={{margin:20}} ref={QRref}>
-                <QRcodeGen value={input} getRef={(e) => setQRref(e)} />
+                <ViewShot style={{ margin: 20 }} ref={QRref}>
+                  <QRcodeGen value={input} getRef={(e) => setQRref(e)} />
                 </ViewShot>
               </View>
             ) : null
           ) : input ? (
             <View style={styles.barcode}>
-              <ViewShot style={{margin:20}}  ref={BarcodeRef}>
+              <ViewShot style={{ margin: 20 }} ref={BarcodeRef}>
                 <Barcode
                   value={input}
                   maxWidth={300}
@@ -239,7 +259,7 @@ const CreateCode = () => {
                 width: "100%",
                 justifyContent: "space-around",
                 alignItems: "center",
-                marginLeft:45,
+                marginLeft: 45,
               }}
             >
               <Button
@@ -261,7 +281,7 @@ const CreateCode = () => {
                 fontSize={20}
                 fontWeight="bold"
                 onPress={() => {
-                  saveFile();
+                  [setRequestPermission((prev) => !prev), saveFile()];
                 }}
               />
               <Button
