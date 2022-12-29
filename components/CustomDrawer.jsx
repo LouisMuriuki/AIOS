@@ -17,17 +17,13 @@ import {
 } from "@expo/vector-icons";
 
 const RateUs = async () => {
-  try {
-    if (StoreReview.isAvailableAsync()) {
-      await StoreReview.requestReview()
+    if (await StoreReview.isAvailableAsync()) {
+       StoreReview.requestReview()
       .then(function(response){
         console.log("response is",response)
        })
       .catch(e => { console.log(e) })
      }
-  } catch (error) {
-    console.log(error);
-  }
 };
 const ShareApp = async () => {
   const url =
@@ -72,7 +68,10 @@ const CustomDrawer = () => {
       <TouchableNativeFeedback
         background={TouchableNativeFeedback.Ripple("#FF7D54", false)}
       >
-        <View style={styles.draweritem} onTouchStart={RateUs}>
+        <View style={styles.draweritem} onTouchStart={() =>
+            Linking.openURL(
+              "https://play.google.com/store/apps/details?id=com.muriuki.AIOS&showAllReviews=true"
+            )}>
           <MaterialIcons name="star-rate" size={28} color="#FF7D54" />
           <Text style={styles.drawertext}>Rate Us</Text>
         </View>

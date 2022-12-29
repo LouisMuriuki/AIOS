@@ -23,7 +23,7 @@ const CreateCode = () => {
   const [textinput, setTextInput] = useState("");
   const [linkinput, setLinkInput] = useState("");
   const [requestpermission, setRequestPermission] = useState(false);
-  const [contact, setContact] = useState({ name: "", number: "" });
+  const [contact, setContact] = useState({ name: '', number: '' });
   const [items, setItems] = useState([
     { label: "BARCODE", value: "barcode" },
     { label: "QRCODE", value: "qrcode" },
@@ -40,7 +40,6 @@ const CreateCode = () => {
   const [qRref, setQRref] = useState();
   const BarcodeRef = useRef();
   const QRref = useRef();
-  console.log(BarcodeRef.current);
   const renderref = useRef();
   useEffect(() => {
     const firstrender = renderref.current;
@@ -96,7 +95,6 @@ const CreateCode = () => {
       if (contact?.name?.length > 0 || contact?.number?.length > 0) {
         let contactarray = [];
         contactarray.push(contact);
-        console.log(contactarray);
         setInput(contactarray);
       } else {
         setInput("");
@@ -115,6 +113,8 @@ const CreateCode = () => {
       setInput(textinput);
     }
   }, [textinput, pressablevalue]);
+
+  console.log(input)
 
   if (hasmediaLibraryPermission === null) {
     return <Text>Requesting for media storage permission</Text>;
@@ -230,7 +230,7 @@ const CreateCode = () => {
             input ? (
               <View style={styles.qrcode}>
                 <ViewShot style={{ margin: 20 }} ref={QRref}>
-                  <QRcodeGen value={input} getRef={(e) => setQRref(e)} />
+                  <QRcodeGen value={`${input}`} getRef={(e) => setQRref(e)} />
                 </ViewShot>
               </View>
             ) : null

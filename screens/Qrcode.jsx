@@ -90,14 +90,16 @@ const Qrcode = () => {
             justifyContent: "center",
             alignItems: "center",
             fontSize: 20,
-            textDecorationLine:"underline",
-            marginBottom:20,
+            textDecorationLine: "underline",
+            marginBottom: 20,
           }}
         >
           QRCODE INFORMATION
         </Text>
         <Text style={{ whiteSpace: "pre-line", fontSize: 17 }}>
-          {data?.replace(/;/g, "\n")}
+          {data.typeof === "stringObject"
+            ? JSON.stringify(data?.replace(/;/g, "\n"))
+            : data?.replace(/;/g, "\n")}
         </Text>
       </MainModal>
     </View>
