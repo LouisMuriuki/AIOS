@@ -36,7 +36,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.muriuki.AIOS",
-      "versionCode":2,
+      "versionCode":3,
       "playStoreUrl":"https://play.google.com/store/apps/details?id=com.muriuki.AIOS&hl=en&gl=US"
     },
     "web": {
