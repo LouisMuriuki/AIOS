@@ -1,10 +1,11 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, Linking, StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DateTime } from "luxon";
 import MainModal from "../components/reusables/Modal";
 import { ModalContext } from "../context/ModalContext";
+import { A } from '@expo/html-elements';
 const Qrcode = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -14,7 +15,9 @@ const Qrcode = () => {
     position: "absolute",
     backgroundColor: "rgba(0, 0, 0, .6)",
   };
-
+  const [islink, setIslink] = useState(null);
+  const expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+  const regex = new RegExp(expression)
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -49,6 +52,10 @@ const Qrcode = () => {
     setData(data);
     setMainModal(true);
   };
+  console.log(data)
+  useEffect(() => { 
+    data?.match(regex) ? Linking.openURL(data)&&setIslink(true) : null
+  }, [data])
 
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
@@ -56,6 +63,7 @@ const Qrcode = () => {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
+
   return (
     <View style={styles.container}>
       <BarCodeScanner
@@ -82,7 +90,9 @@ const Qrcode = () => {
         style={[scanOverlay, { top: 0, right: 0, width: "5%", bottom: 0 }]}
       />
       {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+        <View style={styles.scanbtn}>
+        <Button  title={"Tap to Scan Again"} onPress={() => [setScanned(false),setIslink(null)]} />
+        </View>
       )}
       <MainModal>
         <Text
@@ -96,11 +106,12 @@ const Qrcode = () => {
         >
           QRCODE INFORMATION
         </Text>
-        <Text style={{ whiteSpace: "pre-line", fontSize: 17 }}>
-          {data.typeof === "stringObject"
-            ? JSON.stringify(data?.replace(/;/g, "\n"))
-            : data?.replace(/;/g, "\n")}
-        </Text>
+        {islink===true ? <A href={data} style={{color:"blue", fontSize:18,textDecorationLine:"underline"}}>{data}</A> :
+          <Text style={{ whiteSpace: "pre-line", fontSize: 17 }}>
+            {data?.typeof === "stringObject"
+              ? JSON.stringify(data?.replace(/;/g, "\n"))
+              : data?.replace(/;/g, "\n")}
+          </Text>}
       </MainModal>
     </View>
   );
@@ -118,4 +129,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
   },
+  scanbtn:{
+    position:"absolute",
+    bottom:0,
+    width:"100%"
+  }
 });

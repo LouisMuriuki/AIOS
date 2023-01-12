@@ -1,15 +1,17 @@
-import { Button,StyleSheet, Text, View } from "react-native";
+import { Button, Linking, StyleSheet, Text, View } from "react-native";
 import React, { useState, useEffect, useContext } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DateTime } from "luxon";
 import { ModalContext } from "../context/ModalContext";
 import MainModal from "../components/reusables/Modal";
+import { A } from '@expo/html-elements';
 const Barcode = () => {
   const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
+  const [scanned, setScanned] = useState();
   const { mainModal, setMainModal } = useContext(ModalContext);
   const [data, setData] = useState();
+  const [islink, setIslink] = useState(false);
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -19,6 +21,8 @@ const Barcode = () => {
     getBarCodeScannerPermissions();
   }, []);
 
+  const expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+  const regex = new RegExp(expression)
   // const setObjectValue = async (data, type) => {
   //   const date = new Date();
 
@@ -43,7 +47,9 @@ const Barcode = () => {
     setData(data);
     setMainModal(true);
   };
-
+  useEffect(() => {
+    data?.match(regex) ? Linking.openURL(data)&&setIslink(true): null
+  }, [data])
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
   }
@@ -65,23 +71,25 @@ const Barcode = () => {
       </View>
       <View style={styles.layerBottom} />
       {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+        <Button title={"Tap to Scan Again"} onPress={() => [setScanned(false),setIslink(null)] }/>
       )}
       <MainModal>
-      <Text
+        <Text
           style={{
             justifyContent: "center",
             alignItems: "center",
             fontSize: 20,
-            textDecorationLine:"underline",
-            marginBottom:20,
+            textDecorationLine: "underline",
+            marginBottom: 20,
           }}
         >
           BARCODE INFORMATION
         </Text>
-        <Text style={{ whiteSpace: "pre-line",fontSize: 17 }}>
+        {islink===true ? <A href={data} style={{color:"blue", fontSize:18,textDecorationLine:"underline"}}>{data}</A> : <Text style={{ whiteSpace: "pre-line", fontSize: 17 }}>
           {data?.replace(/;/g, "\n")}
-        </Text>
+        </Text>}
+
+
       </MainModal>
     </View>
   );
